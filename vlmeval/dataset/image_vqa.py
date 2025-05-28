@@ -1545,14 +1545,13 @@ class CountbenchQA(ImageBaseDataset):
 
     def evaluate(self, eval_file, **judge_kwargs):
         import pandas as pd
-        from .utils.countbenchqa import safe_convert
+        from .utils.countbenchqa import safe_convert # This only counts from 0 to 20 since that is our scope.
         
         data = load(eval_file)
 
         pred_ints = data["prediction"].apply(safe_convert)
         answer_ints = data["answer"].astype(int)
         
-        # Count correct predictions (excluding failed conversions)
         correct = (pred_ints == answer_ints).sum()
         total = len(data)
         accuracy = correct / total
@@ -1564,6 +1563,7 @@ class CountbenchQA(ImageBaseDataset):
 
     def build_prompt(self, line):
         msgs = super().build_prompt(line)
+        print("msgs : ", msgs)
         msgs[-1]["value"] += "\nAnswer the question using a single number."
         return msgs
 
@@ -1583,7 +1583,6 @@ class TallyQA(ImageBaseDataset):
         pred_ints = data["prediction"].apply(safe_convert)
         answer_ints = data["answer"].astype(int)
         
-        # Count correct predictions (excluding failed conversions)
         correct = (pred_ints == answer_ints).sum()
         total = len(data)
         accuracy = correct / total
