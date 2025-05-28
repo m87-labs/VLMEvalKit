@@ -1581,9 +1581,9 @@ class MMNIAH(ImageBaseDataset):
 class CountbenchQA(ImageBaseDataset):
     TYPE = 'VQA'
     DATASET_URL = { #/home/ubuntu/LMUData/CountbenchQA.tsv
-        'CountbenchQA': 'https://huggingface.co/datasets/moondream/temp-VLMEvalKit-datasets/resolve/main/countbench_data.tsv'
+        'CountbenchQA': 'https://huggingface.co/datasets/snowclipsed/CountBenchQA/resolve/main/countbench_data.tsv'
     }
-    DATASET_MD5 = {'CountbenchQA': 'c9853275a558ecf59a06c6cd2e44046a'}
+    DATASET_MD5 = {'CountbenchQA': 'd70123bd9d7c090b00101f2116f3a7c6'}
 
     from .utils.tablevqabench import FINTABNETQA_PROMPT, VTABFACT_PROMPT, VWTQ_PROMPT
 
@@ -1607,9 +1607,7 @@ class CountbenchQA(ImageBaseDataset):
         for datapoint in data.to_dict('records'):
             
             i+=1
-            # Skip the samples that have a blank image
-            if i in [163, 263, 371]:
-                continue
+            print('i->', i)
             
             total += 1
             if int(datapoint['answer']) == text2int(datapoint['prediction']):
@@ -1638,9 +1636,9 @@ class CountbenchQA(ImageBaseDataset):
 class TallyQA(ImageBaseDataset):
     TYPE = 'VQA'
     DATASET_URL = { 
-        'TallyQA': 'https://huggingface.co/datasets/moondream/temp-VLMEvalKit-datasets/resolve/main/tallyqa_data.tsv'
+        'TallyQA': 'https://huggingface.co/datasets/snowclipsed/TallyQA/resolve/main/tallyqa_data.tsv'
     }
-    DATASET_MD5 = {'TallyQA': '0e56f5ef5d507280a151cc74a1170475'}
+    DATASET_MD5 = {'TallyQA': '959df01cf1858e73a71efe5cd3b9bf19'}
 
     from .utils.tablevqabench import FINTABNETQA_PROMPT, VTABFACT_PROMPT, VWTQ_PROMPT
 
@@ -1649,6 +1647,7 @@ class TallyQA(ImageBaseDataset):
     @classmethod
     def evaluate(self, eval_file, **judge_kwargs):
         import pandas as pd
+        from .utils.text2int import text2int
 
         data = load(eval_file)
         assert 'answer' in data and 'prediction' in data
@@ -1661,7 +1660,7 @@ class TallyQA(ImageBaseDataset):
 
         for datapoint in data.to_dict('records'):
             total += 1
-            if int(datapoint['answer']) == int_from_string(datapoint['prediction']):
+            if int(datapoint['answer']) == text2int(datapoint['prediction']):
                 correct += 1
             
         score = correct/total
