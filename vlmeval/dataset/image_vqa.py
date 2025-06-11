@@ -2306,7 +2306,12 @@ class CountBenchQA(ImageVQADataset):
             if ans in pred:
                 correct_count += 1
         accuracy = correct_count / total_count if total_count > 0 else 0
-        return {'accuracy': accuracy}
+        result_file = eval_file.replace(f".{eval_file.split('.')[-1]}", "_acc.csv")
+        result_dict = {'accuracy': accuracy}
+        result_df = pd.DataFrame([result_dict])
+        dump(result_df, result_file)
+    
+        return result_dict
 
 
 class OCR_Reasoning(ImageBaseDataset):
