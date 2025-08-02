@@ -293,6 +293,11 @@ class ImageMCQDataset(ImageBaseDataset):
         dump(acc, score_file)
         
         data['correct'] = data['hit'].astype(bool)
+        
+        if 'image_path' not in data.columns and 'image_path' in meta.columns:
+            meta_image_map = {x: y for x, y in zip(meta['index'], meta['image_path'])}
+            data['image_path'] = [meta_image_map.get(idx, '') for idx in data['index']]
+        
         results_json_pth = eval_file.replace(f'.{suffix}', f'_{name_str}_results.json')
         dump(data.to_dict('records'), results_json_pth)
 
