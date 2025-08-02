@@ -291,6 +291,10 @@ class ImageMCQDataset(ImageBaseDataset):
 
         score_file = eval_file.replace(f'.{suffix}', '_acc.csv')
         dump(acc, score_file)
+        
+        data['correct'] = data['hit'].astype(bool)
+        results_json_pth = eval_file.replace(f'.{suffix}', f'_{name_str}_results.json')
+        dump(data.to_dict('records'), results_json_pth)
 
         if dataset == 'AesBench_VAL':
             warnings.warn('Note that AesBench VAL is just a toy version of AesBench TEST. For full results, \

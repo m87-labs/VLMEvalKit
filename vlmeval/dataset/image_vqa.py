@@ -278,6 +278,15 @@ class MathVista(ImageBaseDataset):
         score = MathVista_acc(storage)
         score_pth = storage.replace('.xlsx', '_score.csv')
         dump(score, score_pth)
+        
+        from .utils.mathvista import post_check
+        data = load(storage)
+        for i in range(len(data)):
+            data.loc[i, 'correct'] = post_check(data.iloc[i], prefetch=False)
+        
+        results_json_pth = storage.replace('.xlsx', '_results.json')
+        dump(data.to_dict('records'), results_json_pth)
+        
         return score
 
 
