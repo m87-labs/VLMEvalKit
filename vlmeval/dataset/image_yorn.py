@@ -101,4 +101,13 @@ class ImageYORNDataset(ImageBaseDataset):
 
         score_tgt = eval_file.replace('.xlsx', '_score.csv')
         dump(score, score_tgt)
+        
+        # Add JSON output with correct answers
+        data = load(storage)
+        data['correct'] = data['score']  # score is already boolean
+        
+        suffix = eval_file.split('.')[-1]
+        results_json_pth = eval_file.replace(f'.{suffix}', '_results.json')
+        dump(data.to_dict('records'), results_json_pth)
+        
         return score

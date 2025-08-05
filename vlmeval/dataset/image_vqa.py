@@ -176,11 +176,13 @@ class OCRBench(ImageBaseDataset):
         data = load(eval_file)
         lt = len(data)
         lines = [data.iloc[i] for i in range(lt)]
+        data['correct'] = False
         for i in tqdm(range(len(lines))):
             line = lines[i]
             predict = str(line['prediction'])
             answers = eval(line['answer'])
             category = line['category']
+            correct = False
             if category == 'Handwritten Mathematical Expression Recognition':
                 for j in range(len(answers)):
                     answer = answers[j].strip().replace('\n',
@@ -189,6 +191,7 @@ class OCRBench(ImageBaseDataset):
                                                       ' ').replace(' ', '')
                     if answer in predict:
                         OCRBench_score[category] += 1
+                        correct = True
                         break
             else:
                 for j in range(len(answers)):
@@ -196,7 +199,9 @@ class OCRBench(ImageBaseDataset):
                     predict = predict.lower().strip().replace('\n', ' ')
                     if answer in predict:
                         OCRBench_score[category] += 1
+                        correct = True
                         break
+            data.loc[i, 'correct'] = correct
 
         final_score_dict = {}
         final_score_dict['Text Recognition'] = \
@@ -219,6 +224,11 @@ class OCRBench(ImageBaseDataset):
             float(final_score_dict['Final Score']) / 10)
         score_pth = eval_file.replace('.xlsx', '_score.json')
         dump(final_score_dict, score_pth)
+        
+        suffix = eval_file.split('.')[-1]
+        results_json_pth = eval_file.replace(f'.{suffix}', '_results.json')
+        dump(data.to_dict('records'), results_json_pth)
+        
         return final_score_dict
 
 
@@ -1223,6 +1233,14 @@ class MMVet(ImageBaseDataset):
         score_fine_pth = storage.replace('.xlsx', '_score_fine.csv')
         dump(score, score_pth)
         dump(score_fine, score_fine_pth)
+        
+        # Add JSON output with correct answers
+        data = load(storage)
+        data['correct'] = data['score'] > 0  # Convert scores to boolean (score > 0 means correct)
+        
+        results_json_pth = storage.replace('.xlsx', '_results.json')
+        dump(data.to_dict('records'), results_json_pth)
+        
         return score
 
 
