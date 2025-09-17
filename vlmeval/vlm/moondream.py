@@ -119,16 +119,16 @@ class Moondream2(BaseModel):
         from transformers import AutoModelForCausalLM, AutoTokenizer
         assert osp.exists(model_path) or splitlen(model_path) == 2
 
+        model_path = "vikhyatk/moondream-next"
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
             trust_remote_code=True,
-            torch_dtype=torch.float16,
-            revision=revision,
+            revision="bce9358ca7928fc17c0c82d5fa2253aa681a4624"
         )
 
         self.model = self.model.to("cuda")
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        # self.tokenizer = AutoTokenizer.from_pretrained(model_path)
 
         self.capability = "query"  # Default capability, change to "point" if needed.
 
@@ -157,7 +157,7 @@ class Moondream2(BaseModel):
         if capability == "point":
             return len(self.model.point(enc_image, prompt)["points"])
         elif capability == "query":
-            return self.model.query(enc_image, prompt)["answer"].strip()
+            return self.model.query(enc_image, prompt, settings={"temperature":0})["answer"].strip()
         else:
             raise ValueError(f"Unknown capability: {capability}")
 
